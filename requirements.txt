@@ -1,6 +1,5 @@
 fastapi
 uvicorn 
-sklearn
 joblib
 pandas
 markdown2
