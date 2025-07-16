@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<h1 class="header">Search Results for: {{ query|e }}</h1>
+<div class="results-container">
+    <p>{{ num_results }} result{{ 's' if num_results != 1 else '' }} found.</p>
+    <ul class="results-list">
+        {% for result in results %}
+            <li class="result-ds">
+                <b>{{ result.ds }}</b>:
+                <ul class="snippet-list">
+                    {% for snippet in result.snippets %}
+                        <li class="snippet-item">... {{ snippet|safe }} ...</li>
+                    {% endfor %}
+                </ul>
+                <form action="/full/{{ result.full_id }}" method="get" target="_blank" class="snippet-full-form">
+                    <button type="submit" class="search-button">View Full Document</button>
+                </form>
+            </li>
+        {% endfor %}
+        {% if not results %}
+            <li>No results found.</li>
+        {% endif %}
+    </ul>
+</div>
+<form action="/" method="get" class="back-home-form">
+    <button type="submit" class="back-home-button">Back to Home</button>
+</form>
+{% endblock %} 

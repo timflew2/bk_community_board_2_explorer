@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Full Markdown Document{% endblock %}
+
+{% block content %}
+<h1 class="header">Full Agenda: {{ ds|e }}</h1>
+<div class="results-container">
+    <div class="snippet-item">{{ markdown_html|safe }}</div>
+</div>
+<form action="/" method="get" class="back-home-form">
+    <button type="submit" class="back-home-button">Back to Home</button>
+</form>
+{% endblock %} 

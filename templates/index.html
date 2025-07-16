@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Community Board 2 Agendas{% endblock %}
+
+{% block extra_head %}
+<style>
+    .split-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        /* height: 60vh; */
+        gap: .1em;
+    }
+    .split-half {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 100px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="header">BK Community Board 2 Agendas</h1>
+<div class="split-container">
+    <form action="/search" method="get" class="search-form">
+        <input type="text" name="text" placeholder="Enter keyword to search" required class="search-bar">
+        <button type="submit" class="search-button">Submit</button>
+    </form>
+</div>
+{% endblock %} 

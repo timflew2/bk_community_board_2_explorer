@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Community Board 2 Agendas{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    {% block extra_head %}{% endblock %}
+    <style>
+        .nav-bar {
+            background: #234e70;
+            padding: 1em 0;
+            box-shadow: 0 2px 4px rgba(35, 78, 112, 0.1);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2em;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5em 1em;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .nav-link:hover {
+            background: #3a6ea5;
+        }
+        .nav-link.active {
+            background: #f7a440;
+            color: #234e70;
+        }
+        .content {
+            margin-top: 2em;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">Home</a>
+            <a href="/agendas" class="nav-link {% if request.url.path == '/agendas' %}active{% endif %}">Agendas</a>
+            <a href="/analytics" class="nav-link {% if request.url.path == '/analytics' %}active{% endif %}">Analytics</a>
+            <a href="/map" class="nav-link {% if request.url.path == '/map' %}active{% endif %}">Map</a>
+        </div>
+    </nav>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html> 

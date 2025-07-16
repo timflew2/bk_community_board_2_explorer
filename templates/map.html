@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Map{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    .explore-map-flex {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 2em;
+        width: 100vw;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    #map { height: 70vh; width: 60vw; max-width: 800px; min-width: 350px; margin: 2em 0; border-radius: 12px; border: 2px solid #234e70; }
+    .map-tooltip {
+        background: #f7a54000 !important;
+        color: #234e70 !important;
+        border-radius: 8px !important;
+        font-size: 1em;
+        padding: 0.7em 1.2em !important;
+        /* border: 2px solid #234e70 !important; */
+        box-shadow: none !important;
+    }
+    .filter-panel {
+        min-width: 220px;
+        max-width: 300px;
+        background: #f3f6fa;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(35, 78, 112, 0.06);
+        padding: 1.5em 1em;
+        margin-top: 2em;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .filter-panel label {
+        font-weight: bold;
+        color: #234e70;
+        margin-bottom: 0.5em;
+    }
+    .filter-panel input[type="text"] {
+        font-size: 1em;
+        border-radius: 6px;
+        border: 1px solid #bfc9d1;
+        padding: 0.3em 0.7em;
+        margin-bottom: 1em;
+    }
+    .vertical-checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        margin-bottom: 1em;
+    }
+    .checkbox-label {
+        font-weight: normal;
+        color: #234e70;
+        margin-right: 0.5em;
+    }
+    .filter-panel .search-button {
+        padding: 0.5em 1.5em;
+        align-self: flex-start;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="header">BK Community Board 2 HESS Agendas Map</h1>
+<div class="results-container">
+    <div class="explore-map-flex">
+        <div id="map"></div>
+        <form method="get" class="filter-panel">
+            <label for="ds_start">Date Start:</label>
+            <input type="text" name="ds_start" id="ds_start" value="{{ ds_start }}" placeholder="{{ ds_min }}">
+            <label for="ds_end">Date End:</label>
+            <input type="text" name="ds_end" id="ds_end" value="{{ ds_end }}" placeholder="{{ ds_max }}">
+            <label>Application Type:</label>
+            <div class="vertical-checkbox-group">
+                {% for t in all_application_types %}
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="application_type" value="{{ t }}" {% if t in selected_application_types %}checked{% endif %}>
+                        {{ t }}
+                    </label>
+                {% endfor %}
+            </div>
+            <button type="submit" class="search-button">Filter</button>
+        </form>
+    </div>
+</div>
+<form action="/" method="get" class="back-home-form">
+    <button type="submit" class="back-home-button">Back to Home</button>
+</form>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map').setView([{{ center_lat }}, {{ center_lon }}], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    var pins = {{ pins|tojson|safe }};
+    pins.forEach(function(pin) {
+        var marker = L.marker([pin.lat, pin.lon]).addTo(map);
+        marker.bindPopup(pin.info, {className: 'map-tooltip'});
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}All Agendas{% endblock %}
+
+{% block content %}
+<h1 class="header">BK Community Board 2 HESS Agendas List</h1>
+<div class="results-container" style="max-width: 900px; margin: 0 auto;">
+    {% for year, agendas in agendas_by_year.items() %}
+        <h2 style="margin-top: 2em; color: #234e70;">{{ year }}</h2>
+        <ul class="results-list">
+            {% for agenda in agendas %}
+                <li class="result-ds">
+                    <b>{{ agenda.ds }}</b>
+                    {% if agenda.markdown_path %}
+                        &mdash; <a href="/full/{{ agenda.ds }}" target="_blank">View Markdown</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</div>
+<form action="/" method="get" class="back-home-form">
+    <button type="submit" class="back-home-button">Back to Home</button>
+</form>
+{% endblock %} 

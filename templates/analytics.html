@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Explore Analytics{% endblock %}
+
+{% block content %}
+<h1 class="header">BK Community Board 2 Agendas Analytics</h1>
+<div class="results-container">
+    <form method="get" action="/analytics" class="search-form" style="margin-bottom: 2em;">
+        <label for="agg">Aggregate by:</label>
+        <select name="agg" id="agg" class="search-bar" style="width: 250px;">
+            {% for col in allowed_aggs %}
+                <option value="{{ col }}" {% if col == agg %}selected{% endif %}>{{ col.replace('_', ' ').title() }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="search-button" style="margin-top: 1em;">Show Counts</button>
+    </form>
+    <table style="width: 100%; max-width: 700px; margin: 0 auto; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f7a440; color: #234e70;">
+                <th style="padding: 0.5em 1em; text-align: left;">#</th>
+                <th style="padding: 0.5em 1em; text-align: left;">{{ agg.replace('_', ' ').title() }}</th>
+                <th style="padding: 0.5em 1em; text-align: right;">Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in counts %}
+            <tr style="background: #fff; border-bottom: 1px solid #eee;">
+                <td style="padding: 0.5em 1em;">{{ loop.index }}</td>
+                <td style="padding: 0.5em 1em;">{{ row[agg] }}</td>
+                <td style="padding: 0.5em 1em; text-align: right;">{{ row['count'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<form action="/" method="get" class="back-home-form">
+    <button type="submit" class="back-home-button">Back to Home</button>
+</form>
+{% endblock %} 
