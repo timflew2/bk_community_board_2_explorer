@@ -64,6 +64,16 @@
         padding: 0.5em 1.5em;
         align-self: flex-start;
     }
+    .filter-section {
+        background: #c9dff6;
+        border-radius: 10px;
+        padding: 1em 1em 1em 1em;
+        margin-bottom: 1.2em;
+        box-shadow: 0 1px 4px rgba(35, 78, 112, 0.04);
+    }
+    .filter-section:last-child {
+        margin-bottom: 0;
+    }
 </style>
 {% endblock %}
 
@@ -73,18 +83,23 @@
     <div class="explore-map-flex">
         <div id="map"></div>
         <form method="get" class="filter-panel">
-            <label for="ds_start">Date Start:</label>
-            <input type="text" name="ds_start" id="ds_start" value="{{ ds_start }}" placeholder="{{ ds_min }}">
-            <label for="ds_end">Date End:</label>
-            <input type="text" name="ds_end" id="ds_end" value="{{ ds_end }}" placeholder="{{ ds_max }}">
-            <label>Application Type:</label>
-            <div class="vertical-checkbox-group">
-                {% for t in all_application_types %}
-                    <label class="checkbox-label">
-                        <input type="checkbox" name="application_type" value="{{ t }}" {% if t in selected_application_types %}checked{% endif %}>
-                        {{ t }}
-                    </label>
-                {% endfor %}
+            <div class="filter-section">
+                <label for="ds_start">Date Start:</label>
+                <input type="text" name="ds_start" id="ds_start" value="{{ ds_start }}" placeholder="{{ ds_min }}">
+                <br>
+                <label for="ds_end">Date End:</label>
+                <input type="text" name="ds_end" id="ds_end" value="{{ ds_end }}" placeholder="{{ ds_max }}">
+            </div>
+            <div class="filter-section">
+                <label>Application Type:</label>
+                <div class="vertical-checkbox-group">
+                    {% for t in all_application_types %}
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="application_type" value="{{ t }}" {% if t in selected_application_types %}checked{% endif %}>
+                            {{ t }}
+                        </label>
+                    {% endfor %}
+                </div>
             </div>
             <button type="submit" class="search-button">Filter</button>
         </form>

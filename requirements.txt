@@ -1,2 +1,8 @@
 fastapi
 uvicorn 
+sklearn
+joblib
+pandas
+markdown2
+slowapi
+jinja2

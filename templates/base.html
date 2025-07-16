@@ -18,6 +18,20 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        .nav-brand {
+            color: #2f5776;
+            font-weight: bold;
+            font-size: 1.1em;
+            line-height: 1.2;
+            white-space: pre-line;
+            margin-right: 2em;
+            text-align: left;
+            letter-spacing: 0.5px;
+            background: #fff;
+            padding: 0.5em 1em;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
         .nav-link {
             color: #fff;
             text-decoration: none;
@@ -41,6 +55,7 @@
 <body>
     <nav class="nav-bar">
         <div class="nav-container">
+            <div class="nav-brand">BK CB2 HESS<br>Agenda Explorer</div>
             <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">Home</a>
             <a href="/agendas" class="nav-link {% if request.url.path == '/agendas' %}active{% endif %}">Agendas</a>
             <a href="/analytics" class="nav-link {% if request.url.path == '/analytics' %}active{% endif %}">Analytics</a>

@@ -66,12 +66,28 @@ def full_markdown(request: Request, ds_id: str):
     )
 
 @app.get("/analytics", response_class=HTMLResponse)
-def explore(request: Request, agg: str = Query('application_type', description="Column to aggregate")):
+def explore(
+    request: Request,
+    agg: str = Query('application_type', description="Column to aggregate"),
+    postal_code: str = Query(None, description="Postal code to filter"),
+    application_type: str = Query(None, description="Application type to filter"),
+    business_name: str = Query(None, description="Business name to filter"),
+    business_address: str = Query(None, description="Business address to filter")
+):
     # Only allow aggregations on certain columns
-    allowed_aggs = ['application_type', 'business_name', 'business_address']
+    allowed_aggs = ['application_type', 'business_name', 'business_address', 'postal_code']
     if agg not in allowed_aggs:
         agg = 'application_type'
-    counts = agenda_items_df[agg].value_counts().sort_values(ascending=False)
+    filtered_df = agenda_items_df
+    if postal_code:
+        filtered_df = filtered_df[filtered_df['postal_code'].astype(str).str.strip() == postal_code.strip()]
+    if application_type:
+        filtered_df = filtered_df[filtered_df['application_type'].astype(str).str.strip() == application_type.strip()]
+    if business_name:
+        filtered_df = filtered_df[filtered_df['business_name'].astype(str).str.strip() == business_name.strip()]
+    if business_address:
+        filtered_df = filtered_df[filtered_df['business_address'].astype(str).str.strip() == business_address.strip()]
+    counts = filtered_df[agg].value_counts().sort_values(ascending=False)
     counts = counts.reset_index()
     return templates.TemplateResponse(
         "analytics.html",
@@ -79,7 +95,11 @@ def explore(request: Request, agg: str = Query('application_type', description="
             "request": request,
             "agg": agg,
             "counts": counts.to_dict(orient='records'),
-            "allowed_aggs": allowed_aggs
+            "allowed_aggs": allowed_aggs,
+            "postal_code": postal_code or "",
+            "application_type": application_type or "",
+            "business_name": business_name or "",
+            "business_address": business_address or ""
         }
     )
 
@@ -90,6 +110,16 @@ def explore_map(request: Request,
                 application_type: list[str] = Query(None, description="Application types to filter")):
     # Drop rows with missing coordinates
     map_df = agenda_items_df.dropna(subset=["latitude", "longitude"])
+    # Determine the most recent year in the ds column
+    ds_years = map_df["ds"].astype(str).str[:4]
+    most_recent_year = ds_years.max()
+    # If ds_start and ds_end are not provided, default to the most recent year
+    if ds_start is None and ds_end is None:
+        year_mask = map_df["ds"].astype(str).str.startswith(most_recent_year)
+        year_ds = map_df[year_mask]["ds"]
+        if not year_ds.empty:
+            ds_start = year_ds.min()
+            ds_end = year_ds.max()
     # Filter by ds range if provided
     if ds_start:
         map_df = map_df[map_df["ds"] >= ds_start]
@@ -106,7 +136,7 @@ def explore_map(request: Request,
         markdown_url = f"/full/{row['ds_md']}" if pd.notnull(row['ds_md']) else None
         info = f"{row['application_name']}<br>{row['business_name']}<br>{row['business_address']}<br>{row['application_type']}"
         if markdown_url:
-            info += f'<br><a href=\"{markdown_url}\" target=\"_blank\">View Markdown</a>'
+            info += f'<br><a href="{markdown_url}" target="_blank">View Markdown</a>'
         pins.append({
             "lat": row["latitude"],
             "lon": row["longitude"],

@@ -12,6 +12,13 @@ body {
     color: #234e70; /* Muted deep blue */
 }
 
+.header2 {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.5em;
+    color: #234e70; /* Muted deep blue */
+}
+
 .about-text {
     display: flex;
     flex-direction: column;
