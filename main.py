@@ -35,10 +35,6 @@ agenda_items_df.loc[:,"postal_code"] = postal_codes
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
-@app.get("/favicon.ico", include_in_schema=False)
-def favicon():
-    return FileResponse("images/ft_greene.png")
-
 templates = Jinja2Templates(directory="templates")
 
 
