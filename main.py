@@ -27,6 +27,11 @@ def rate_limit_handler(request, exc):
 
 markdown_texts_df = pd.read_csv('data/markdown_texts.tsv', sep='\t')
 agenda_items_df = pd.read_csv('data/agenda_items.tsv', sep='\t')
+postal_codes = (
+    agenda_items_df.postal_code.apply(lambda x: str(int(x)) if isinstance(x, float) and x>0 else None)
+)
+agenda_items_df.drop("postal_code",axis=1,inplace=True)
+agenda_items_df.loc[:,"postal_code"] = postal_codes
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
@@ -175,6 +180,46 @@ def list_agendas(request: Request):
         {
             "request": request,
             "agendas_by_year": dict(sorted(agendas_by_year.items(), reverse=True))
+        }
+    )
+
+@app.get("/latest", response_class=HTMLResponse)
+def latest_agenda_items(request: Request):
+    # Find the latest ds value
+    latest_ds = agenda_items_df['ds'].max()
+    latest_items = agenda_items_df[agenda_items_df['ds'] == latest_ds]
+    latest_items_list = []
+    for _, item in latest_items.iterrows():
+        # Find historical items with same business_name OR business_address, but different ds
+        historical = agenda_items_df[(
+            ((agenda_items_df['business_name'] == item['business_name']) | (agenda_items_df['business_address'] == item['business_address'])) &
+            (agenda_items_df['ds'] != item['ds'])
+        )]
+        # Add match_reason to each historical item
+        historical_items = []
+        for _, hist in historical.iterrows():
+            hist_dict = hist.to_dict()
+            if hist['business_name'] == item['business_name'] and hist['business_address'] == item['business_address']:
+                hist_dict['match_reason'] = 'business_name & business_address'
+            elif hist['business_name'] == item['business_name']:
+                hist_dict['match_reason'] = 'business_name'
+            elif hist['business_address'] == item['business_address']:
+                hist_dict['match_reason'] = 'business_address'
+            else:
+                hist_dict['match_reason'] = ''
+            historical_items.append(hist_dict)
+        item_dict = item.to_dict()
+        item_dict['historical_items'] = historical_items
+        item_dict['has_history'] = len(historical_items) > 0
+        latest_items_list.append(item_dict)
+    # Sort so items with history appear first
+    latest_items_list.sort(key=lambda x: not x['has_history'])
+    return templates.TemplateResponse(
+        "latest.html",
+        {
+            "request": request,
+            "latest_items": latest_items_list,
+            "latest_ds": latest_ds
         }
     )
 
