@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Query
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 import pandas as pd
 from fastapi.staticfiles import StaticFiles
 import markdown2
@@ -34,6 +34,10 @@ agenda_items_df.drop("postal_code",axis=1,inplace=True)
 agenda_items_df.loc[:,"postal_code"] = postal_codes
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return FileResponse("images/ft_greene.png")
 
 templates = Jinja2Templates(directory="templates")
 
