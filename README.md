@@ -8,7 +8,9 @@ So I made this site in order to go into these meetings prepared to understand an
 
 <h2>Workflow</h2>
 1. Downloaded the agenda pdf's from [Google Drive](https://drive.google.com/drive/folders/1vP5RRdeO7Hq4skAh3kF3caUOAseeP27w)
+
 2. Converted the pdf's to Markdown docling (for basic Markdown) and pymupdf (for links)
+
 3. Gave gpt-4o the parsed Markdown and images of the pdf's to correct any conversion errors
 4. Instructed gpt-4o to parse out any business applications. These are an important part of HESS meetings and where a lot of the most exciting conversations happen.
 5. Inferred geo coordinates using geopy
