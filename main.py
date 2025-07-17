@@ -12,7 +12,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from fastapi.templating import Jinja2Templates
 from fastapi import Request
 import html
-from search_helpers import search_markdown_dataframe
+from search_helpers import search_markdown_dataframe, search_markdown_snippets_dataframe_embedding
 
 app = FastAPI()
 
@@ -26,12 +26,13 @@ def rate_limit_handler(request, exc):
     return PlainTextResponse("Rate limit exceeded. Please try again later.", status_code=429)
 
 markdown_texts_df = pd.read_csv('data/markdown_texts.tsv', sep='\t')
-agenda_items_df = pd.read_csv('data/agenda_items.tsv', sep='\t')
+markdown_snippets_df = pd.read_csv('data/markdown_snippets.tsv', sep='\t')
+business_applications_df = pd.read_csv('data/business_applications.tsv', sep='\t')
 postal_codes = (
-    agenda_items_df.postal_code.apply(lambda x: str(int(x)) if isinstance(x, float) and x>0 else None)
+    business_applications_df.postal_code.apply(lambda x: str(int(x)) if isinstance(x, float) and x>0 else None)
 )
-agenda_items_df.drop("postal_code",axis=1,inplace=True)
-agenda_items_df.loc[:,"postal_code"] = postal_codes
+business_applications_df.drop("postal_code",axis=1,inplace=True)
+business_applications_df.loc[:,"postal_code"] = postal_codes
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
@@ -43,10 +44,12 @@ templates = Jinja2Templates(directory="templates")
 def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+
+
 @app.get("/search", response_class=HTMLResponse)
 @limiter.limit("10/minute")
 def search_results(request: Request, text: str = Query(..., description="Keyword to search")):
-    results = search_markdown_dataframe(markdown_texts_df, text)
+    results = search_markdown_snippets_dataframe_embedding(markdown_snippets_df, text)
     return templates.TemplateResponse(
         "search_results.html",
         {
@@ -83,7 +86,7 @@ def explore(
     allowed_aggs = ['application_type', 'business_name', 'business_address', 'postal_code']
     if agg not in allowed_aggs:
         agg = 'application_type'
-    filtered_df = agenda_items_df
+    filtered_df = business_applications_df
     if postal_code:
         filtered_df = filtered_df[filtered_df['postal_code'].astype(str).str.strip() == postal_code.strip()]
     if application_type:
@@ -114,7 +117,7 @@ def explore_map(request: Request,
                 ds_end: str = Query(None, description="End ds (inclusive)"),
                 application_type: list[str] = Query(None, description="Application types to filter")):
     # Drop rows with missing coordinates
-    map_df = agenda_items_df.dropna(subset=["latitude", "longitude"])
+    map_df = business_applications_df.dropna(subset=["latitude", "longitude"])
     # Determine the most recent year in the ds column
     ds_years = map_df["ds"].astype(str).str[:4]
     most_recent_year = ds_years.max()
@@ -148,9 +151,9 @@ def explore_map(request: Request,
             "info": info
         })
     # For filter UI: get all unique application_types and ds min/max
-    all_application_types = sorted(agenda_items_df["application_type"].dropna().unique())
-    ds_min = str(agenda_items_df["ds"].min())
-    ds_max = str(agenda_items_df["ds"].max())
+    all_application_types = sorted(business_applications_df["application_type"].dropna().unique())
+    ds_min = str(business_applications_df["ds"].min())
+    ds_max = str(business_applications_df["ds"].max())
     return templates.TemplateResponse(
         "map.html",
         {
@@ -184,16 +187,16 @@ def list_agendas(request: Request):
     )
 
 @app.get("/latest", response_class=HTMLResponse)
-def latest_agenda_items(request: Request):
+def latest_business_applications_df(request: Request):
     # Find the latest ds value
-    latest_ds = agenda_items_df['ds'].max()
-    latest_items = agenda_items_df[agenda_items_df['ds'] == latest_ds]
+    latest_ds = business_applications_df['ds'].max()
+    latest_items = business_applications_df[business_applications_df['ds'] == latest_ds]
     latest_items_list = []
     for _, item in latest_items.iterrows():
         # Find historical items with same business_name OR business_address, but different ds
-        historical = agenda_items_df[(
-            ((agenda_items_df['business_name'] == item['business_name']) | (agenda_items_df['business_address'] == item['business_address'])) &
-            (agenda_items_df['ds'] != item['ds'])
+        historical = business_applications_df[(
+            ((business_applications_df['business_name'] == item['business_name']) | (business_applications_df['business_address'] == item['business_address'])) &
+            (business_applications_df['ds'] != item['ds'])
         )]
         # Add match_reason to each historical item
         historical_items = []

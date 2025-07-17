@@ -3,10 +3,11 @@
 {% block title %}BK CB2 HESS Analytics{% endblock %}
 
 {% block content %}
-<h1 class="header">Agenda Analytics</h1>
+<h1 class="header">Business Application Analytics</h1>
 <div class="results-container" style="max-width: 900px; margin: 0 auto;">
     <div style="display: flex; flex-direction: row; gap: 2em; align-items: flex-start; justify-content: flex-start;">
         <form method="get" action="/analytics" class="filter-panel" style="min-width: 220px; max-width: 300px; background: #f3f6fa; border-radius: 10px; box-shadow: 0 2px 8px rgba(35, 78, 112, 0.06); padding: 1.5em 1em; display: flex; flex-direction: column; gap: 1em;">
+            <h3>Filters</h3>
             <label for="postal_code">Postal Code:</label>
             <input type="text" name="postal_code" id="postal_code" value="{{ postal_code }}" placeholder="e.g. 11201" style="width: 100%;">
             <label for="application_type">Application Type:</label>
@@ -19,6 +20,7 @@
             <input type="hidden" name="agg" value="{{ agg }}">
         </form>
         <form method="get" action="/analytics" class="search-form" style="margin-bottom: 2em; display: flex; flex-direction: column; gap: 1em; align-items: flex-start;">
+            <h3>Aggregation</h3>
             <label for="agg">Aggregate by:</label>
             <select name="agg" id="agg" class="search-bar" style="width: 250px;">
                 {% for col in allowed_aggs %}

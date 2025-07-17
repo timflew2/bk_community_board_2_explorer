@@ -5,3 +5,5 @@ pandas
 markdown2
 slowapi
 jinja2
+sentence_transformers
+faiss-cpu

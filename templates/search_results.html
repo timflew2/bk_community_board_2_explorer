@@ -9,15 +9,16 @@
     <ul class="results-list">
         {% for result in results %}
             <li class="result-ds">
-                <b>{{ result.ds }}</b>:
-                <ul class="snippet-list">
-                    {% for snippet in result.snippets %}
-                        <li class="snippet-item">... {{ snippet|safe }} ...</li>
-                    {% endfor %}
-                </ul>
+                <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                    <b>{{ result.ds }}</b> 
+                    <span style="font-size: 0.95em; color: #f7a440; font-weight: bold; margin-right: 1em; min-width: 90px;">{{ result.snippet_type }}</span>
+                </div>
+                <div class="snippet-item">... {{ result.snippet|safe }} ...</div>
+                {% if result.ds %}
                 <form action="/full/{{ result.full_id }}" method="get" target="_blank" class="snippet-full-form">
                     <button type="submit" class="search-button">View Full Document</button>
                 </form>
+                {% endif %}
             </li>
         {% endfor %}
         {% if not results %}
@@ -25,7 +26,4 @@
         {% endif %}
     </ul>
 </div>
-<form action="/" method="get" class="back-home-form">
-    <button type="submit" class="back-home-button">Back to Home</button>
-</form>
 {% endblock %} 
