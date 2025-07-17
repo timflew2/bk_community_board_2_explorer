@@ -7,6 +7,7 @@ Community boards are an important part of NYC's government, giving residents a v
 So I made this site in order to go into these meetings prepared to understand and ask critical questions, and be a more engaged citizen in my local government.
 
 <h2>Workflow</h2>
+
 1. Downloaded the agenda pdf's from [Google Drive](https://drive.google.com/drive/folders/1vP5RRdeO7Hq4skAh3kF3caUOAseeP27w)
 
 2. Converted the pdf's to Markdown docling (for basic Markdown) and pymupdf (for links)
@@ -24,6 +25,7 @@ So I made this site in order to go into these meetings prepared to understand an
 8. Deployed using Railway
 
 <h2>Notes</h2>
+
 * Multimodal pdf conversion worked surprisingly well
 
 * The business application parsing mostly works but could use some improvement (e.g., couldn't figure out when to use section headers vs. tags)
@@ -31,6 +33,7 @@ So I made this site in order to go into these meetings prepared to understand an
 * geopy location inference generally worked but missed a few items
 
 <h2>Future Plans</h2>
+
 * Expand to other CB2 committees
 
 * Iterate on business application parsing
