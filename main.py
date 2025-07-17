@@ -226,3 +226,10 @@ def latest_business_applications_df(request: Request):
         }
     )
 
+@app.get("/about", response_class=HTMLResponse)
+def about_page(request: Request):
+    return templates.TemplateResponse(
+        "about.html",
+        {"request": request}
+    )
+
