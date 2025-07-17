@@ -22,8 +22,13 @@
             </li>
         {% endfor %}
         {% if not results %}
-            <li>No results found.</li>
+            <li style="text-align: center; width: 100%; font-size: 1.2em; color: #888;">No results found.</li>
         {% endif %}
     </ul>
 </div>
+
+<form action="/search" method="get" class="search-form" style="margin-top: 2em; display: flex; flex-direction: column; align-items: center;">
+    <input type="text" name="text" placeholder="Enter keyword to search" required class="search-bar" style="width: 400px; margin-bottom: 1em;">
+    <button type="submit" class="search-button">Search Again</button>
+</form>
 {% endblock %} 
