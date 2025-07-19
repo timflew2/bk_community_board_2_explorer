@@ -3,21 +3,23 @@
 {% block title %}BK Community Board 2 HESS Agendas{% endblock %}
 
 {% block content %}
+<h1 class="header">Latest BK CB2 HESS Business Applications</h1>
 {% set pins_json = pins|tojson %}
 {% set ds_date = latest_ds[:10] %}
+{% set first_ds = latest_items[0].ds if latest_items and latest_items[0].ds else None %}
 {% if ds_date < today %}
-<h1 class="header">Latest Business Applications</h1>
+
 <p class="header2" style="text-align:center; margin-top: 1em;">
-    The last business applications were reviewed in the meeting on {{ latest_ds }}
-    <br> Go to <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">the <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">BK CB2 Health, Environment & Social Services (HESS) homepage</a> to find out more!
+    The last business applications were reviewed in the meeting on {{ latest_ds }} {% if first_ds %}<a href="/full/{{ first_ds }}" target="_blank">(Agenda)</a>{% endif %}.
+    <br>Go to <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">the BK CB2 Health, Environment & Social Services (HESS) homepage</a> to find out more!
 </p>
 {% else %}
-<h1 class="header">Latest Business Applications ({{ latest_ds }})</h1>
 <p class="header2" style="text-align:center; margin-top: 1em;">
-    The next business applications will be reviewed on {{ latest_ds }}
-    <br>Use this site to prepare for the meeting and go to <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">the <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">BK CB2 Health, Environment & Social Services (HESS) homepage</a> to find out more!
+    The next business applications will be reviewed on {{ latest_ds }} {% if first_ds %} <a href="/full/{{ first_ds }}" target="_blank">(Agenda)</a>{% endif %}.
+    <br>Use this site to prepare for the meeting and go to <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">the BK CB2 Health, Environment & Social Services (HESS) homepage</a> to find out more!
 </p>
 {% endif %}
+
 <div class="results-container" style="max-width: 900px; margin: 0 auto;">
     <table style="width: 100%; max-width: 900px; margin: 0 auto; border-collapse: collapse;">
         <thead>
@@ -27,7 +29,6 @@
                 <th style="padding: 0.5em 1em; text-align: left;">Business Address</th>
                 <th style="padding: 0.5em 1em; text-align: left;">Postal Code</th>
                 <th style="padding: 0.5em 1em; text-align: left;">Application Type</th>
-                <th style="padding: 0.5em 1em; text-align: left;">Markdown</th>
                 <th style="padding: 0.5em 1em; text-align: left;"></th>
             </tr>
         </thead>
@@ -39,13 +40,6 @@
                 <td style="padding: 0.5em 1em;">{{ item.business_address }}</td>
                 <td style="padding: 0.5em 1em;">{{ item.postal_code }}</td>
                 <td style="padding: 0.5em 1em;">{{ item.application_type }}</td>
-                <td style="padding: 0.5em 1em;">
-                    {% if item.markdown_path %}
-                        <a href="/full/{{ item.ds }}" target="_blank">View Markdown</a>
-                    {% else %}
-                        N/A
-                    {% endif %}
-                </td>
                 <td style="padding: 0.5em 1em;">
                     {% if item.has_history %}
                         <button type="button" onclick="toggleHistory('{{ loop.index0 }}')">Show History</button>
@@ -80,9 +74,20 @@
 </div>
 
 <!-- Map section below the agenda table -->
-<div class="results-container">
+<div class="results-container" style="display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 2em;">
     <div style="display: flex; flex-direction: column; align-items: center;">
         <div id="map" style="height: 70vh; width: 60vw; max-width: 800px; min-width: 350px; margin: 2em 0; border-radius: 12px; border: 2px solid #234e70;"></div>
+    </div>
+    <div id="map-legend" style="background: #fffbe6; border: 1px solid #eee; border-radius: 10px; padding: 1.2em 1.5em; margin-top: 2em; min-width: 180px; max-width: 220px; box-shadow: 0 2px 8px rgba(35, 78, 112, 0.06);">
+        <h3 style="margin-top: 0; color: #234e70; font-size: 1.1em;">Legend</h3>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+            {% for entry in legend %}
+            <li style="display: flex; align-items: center; margin-bottom: 0.7em;">
+                <span style="display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: {{ entry.color }}; margin-right: 0.7em; border: 1.5px solid #234e70;"></span>
+                <span style="color: #234e70; font-size: 1em;">{{ entry.type }}</span>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 <script type="application/json" id="pins-data">{{ pins_json|safe }}</script>
@@ -106,7 +111,13 @@ document.addEventListener('DOMContentLoaded', function() {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
     pins.forEach(function(pin) {
-        var marker = L.marker([pin.lat, pin.lon]).addTo(map);
+        var marker = L.circleMarker([pin.lat, pin.lon], {
+            radius: 10,
+            color: pin.color,
+            fillColor: pin.color,
+            fillOpacity: 0.85,
+            weight: 2
+        }).addTo(map);
         marker.bindPopup(pin.info, {className: 'map-tooltip'});
     });
 });

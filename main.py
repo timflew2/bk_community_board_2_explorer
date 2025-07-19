@@ -78,6 +78,18 @@ def read_root(request: Request):
     # Filter to only the latest_ds
     map_df = map_df[map_df["ds"] == latest_ds]
     merged_df = map_df.merge(markdown_texts_df[["markdown_path", "ds"]], on="markdown_path", how="left", suffixes=("", "_md"))
+
+    # Assign colors to application types
+    unique_types = list(map_df["application_type"].dropna().unique())
+    color_palette = [
+        '#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00',
+        '#ffff33', '#a65628', '#f781bf', '#999999', '#66c2a5',
+        '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854', '#ffd92f',
+        '#e5c494', '#b3b3b3'
+    ]
+    type_to_color = {t: color_palette[i % len(color_palette)] for i, t in enumerate(unique_types)}
+    legend = [{"type": t, "color": type_to_color[t]} for t in unique_types]
+
     pins = []
     for _, row in merged_df.iterrows():
         markdown_url = f"/full/{row['ds_md']}" if pd.notnull(row['ds_md']) else None
@@ -87,7 +99,9 @@ def read_root(request: Request):
         pins.append({
             "lat": row["latitude"],
             "lon": row["longitude"],
-            "info": info
+            "info": info,
+            "application_type": row["application_type"],
+            "color": type_to_color.get(row["application_type"], "#234e70")
         })
     # Center map as before
     center_lat = 40.6901669
@@ -104,7 +118,9 @@ def read_root(request: Request):
             "pins": pins,
             "center_lat": center_lat,
             "center_lon": center_lon,
-            "today": today
+            "today": today,
+            "type_to_color": type_to_color,
+            "legend": legend
         }
     )
 
