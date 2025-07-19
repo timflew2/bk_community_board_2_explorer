@@ -13,6 +13,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi import Request
 import html
 from search_helpers import search_markdown_dataframe, search_markdown_snippets_dataframe_embedding
+from datetime import date
 
 app = FastAPI()
 
@@ -42,8 +43,70 @@ templates = Jinja2Templates(directory="templates")
 # Update the form action on the home page to point to /search
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    # --- Latest agenda logic (from /latest) ---
+    latest_ds = business_applications_df['ds'].max()
+    latest_items = business_applications_df[business_applications_df['ds'] == latest_ds]
+    latest_items_list = []
+    for _, item in latest_items.iterrows():
+        historical = business_applications_df[
+            (
+                ((business_applications_df['business_name'] == item['business_name']) |
+                 (business_applications_df['business_address'] == item['business_address'])) &
+                (business_applications_df['ds'] != item['ds'])
+            )
+        ]
+        historical_items = []
+        for _, hist in historical.iterrows():
+            hist_dict = hist.to_dict()
+            if hist['business_name'] == item['business_name'] and hist['business_address'] == item['business_address']:
+                hist_dict['match_reason'] = 'business_name & business_address'
+            elif hist['business_name'] == item['business_name']:
+                hist_dict['match_reason'] = 'business_name'
+            elif hist['business_address'] == item['business_address']:
+                hist_dict['match_reason'] = 'business_address'
+            else:
+                hist_dict['match_reason'] = ''
+            historical_items.append(hist_dict)
+        item_dict = item.to_dict()
+        item_dict['historical_items'] = historical_items
+        item_dict['has_history'] = len(historical_items) > 0
+        latest_items_list.append(item_dict)
+    latest_items_list.sort(key=lambda x: not x['has_history'])
 
+    # --- Map logic (from /map, filtered to most recent date) ---
+    map_df = business_applications_df.dropna(subset=["latitude", "longitude"])
+    # Filter to only the latest_ds
+    map_df = map_df[map_df["ds"] == latest_ds]
+    merged_df = map_df.merge(markdown_texts_df[["markdown_path", "ds"]], on="markdown_path", how="left", suffixes=("", "_md"))
+    pins = []
+    for _, row in merged_df.iterrows():
+        markdown_url = f"/full/{row['ds_md']}" if pd.notnull(row['ds_md']) else None
+        info = f"{row['application_name']}<br>{row['business_name']}<br>{row['business_address']}<br>{row['application_type']}"
+        if markdown_url:
+            info += f'<br><a href="{markdown_url}" target="_blank">View Markdown</a>'
+        pins.append({
+            "lat": row["latitude"],
+            "lon": row["longitude"],
+            "info": info
+        })
+    # Center map as before
+    center_lat = 40.6901669
+    center_lon = -73.9844747
+
+    today = date.today().isoformat()
+
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "latest_items": latest_items_list,
+            "latest_ds": latest_ds,
+            "pins": pins,
+            "center_lat": center_lat,
+            "center_lon": center_lon,
+            "today": today
+        }
+    )
 
 
 @app.get("/search", response_class=HTMLResponse)
