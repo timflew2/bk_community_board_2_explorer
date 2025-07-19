@@ -10,12 +10,12 @@
 {% if ds_date < today %}
 
 <p class="header2" style="text-align:center; margin-top: 1em;">
-    The last business applications were reviewed in the meeting on {{ latest_ds }} {% if first_ds %}<a href="/full/{{ first_ds }}" target="_blank">(Agenda)</a>{% endif %}.
+    The last business applications were reviewed in {% if first_ds %}<a href="/full/{{ first_ds }}" target="_blank">{{ latest_ds }}'s meeting</a>{% endif %}.
     <br>Go to <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">the BK CB2 Health, Environment & Social Services (HESS) homepage</a> to find out more!
 </p>
 {% else %}
 <p class="header2" style="text-align:center; margin-top: 1em;">
-    The next business applications will be reviewed on {{ latest_ds }} {% if first_ds %} <a href="/full/{{ first_ds }}" target="_blank">(Agenda)</a>{% endif %}.
+    The next business applications will be reviewed in {% if first_ds %}<a href="/full/{{ first_ds }}" target="_blank">{{ latest_ds }}'s meeting</a>{% endif %}.
     <br>Use this site to prepare for the meeting and go to <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">the BK CB2 Health, Environment & Social Services (HESS) homepage</a> to find out more!
 </p>
 {% endif %}
