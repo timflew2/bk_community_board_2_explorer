@@ -3,24 +3,28 @@
 {% block title %}BK Community Board 2 HESS Agendas{% endblock %}
 
 {% block content %}
-<h1 class="header">Latest BK CB2 HESS Business Applications</h1>
+<h1 class="header">Get ready for the next Brooklyn Community Board 2<br>Health, Environment & Social Services Meeting!</h1>
 {% set pins_json = pins|tojson %}
 {% set ds_date = latest_ds[:10] %}
 {% set first_ds = latest_items[0].ds if latest_items and latest_items[0].ds else None %}
 {% if ds_date < today %}
 
 <p class="header2" style="text-align:center; margin-top: 1em;">
-    The last business applications were reviewed in {% if first_ds %}<a href="/full/{{ first_ds }}" target="_blank">{{ latest_ds }}'s meeting</a>{% endif %}.
+    The last meeting was held on {% if first_ds %}<a href="/full/{{ first_ds }}" target="_blank">{{ latest_ds }}</a>{% endif %}.
     <br>Go to <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">the BK CB2 Health, Environment & Social Services (HESS) homepage</a> to find out more!
 </p>
 {% else %}
 <p class="header2" style="text-align:center; margin-top: 1em;">
-    The next business applications will be reviewed in {% if first_ds %}<a href="/full/{{ first_ds }}" target="_blank">{{ latest_ds }}'s meeting</a>{% endif %}.
+    The next meeting will be on {% if first_ds %}<a href="/full/{{ first_ds }}" target="_blank">{{ latest_ds }}</a>{% endif %}.
     <br>Use this site to prepare for the meeting and go to <a href="https://cbbrooklyn.cityofnewyork.us/cb2/all-committees/health-environment-social-services/" target="_blank">the BK CB2 Health, Environment & Social Services (HESS) homepage</a> to find out more!
 </p>
 {% endif %}
 
 <div class="results-container" style="max-width: 900px; margin: 0 auto;">
+    <p class="header2" style="text-align:center; margin-top: 1em;">
+        <b>Business Applications</b>
+    </p>
+    <p style="text-align:center">The HESS committee reviews business changes such as liquor licenses, cannabis, street dining, etc.</p>
     <table style="width: 100%; max-width: 900px; margin: 0 auto; border-collapse: collapse;">
         <thead>
             <tr style="background: #f7a440; color: #234e70;">
